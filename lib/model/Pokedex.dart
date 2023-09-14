@@ -2,26 +2,26 @@
 
 import 'Pokemon.dart';
 
-bool strcmp(String a, String b) {
-  a = a.toLowerCase();
-  b = b.toLowerCase();
-  if (a.length<b.length) return false;
-  for (int i = 0; i < b.length; ++i) {
-    if (a[i] != b[i]) return false;
+class Search {
+  static bool compare(String dest, String given) { // function to find if given is prefix of dest
+    if (given.length>dest.length) return false;
+    else {
+      return (given == dest.substring(0,given.length).toLowerCase());
+    }
   }
-  return true;
 }
 
 class Pokedex {
   Pokedex(this.pokedex) {
-    n=pokedex.length;
+    POKEDEX_SIZE=pokedex.length;
   }
   List<Pokemon> pokedex = [];
-  late int n;
+  late final int POKEDEX_SIZE;
+  // basic search. Iterate all pokemon in pokedex and compare with the given name
   Pokedex search(String name) {
     List<Pokemon> _result = [];
-    for (int i=0;i<n;++i){
-      if (strcmp(pokedex[i].name,name)) {
+    for (int i = 0; i < POKEDEX_SIZE; ++i){
+      if (Search.compare(pokedex[i].name,name)) {
         _result.add(pokedex[i]);
       }
     }

@@ -20,11 +20,12 @@ void main() async {
     item=data;
   }
   await readJson();
-  for (int i = 0; i < 809; ++i) {
+  int POKEMON_LIST_SIZE = item.length;
+  for (int i = 0; i < POKEMON_LIST_SIZE; ++i) {
     pokemons.add(Pokemon.fromJson(item[i]));
   }
-  Pokedex pokedex = Pokedex(pokemons);
-  runApp(myApp(pokedex: pokedex,));
+  Pokedex POKEDEX = Pokedex(pokemons);
+  runApp(myApp(pokedex: POKEDEX,));
 }
 
 class myApp extends StatelessWidget {
@@ -36,38 +37,36 @@ class myApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'test',
-      //home: M(pokedex: pokedex,),
+      title: 'Pokedex',
       home: BlocProvider (
         create: (context) => searchCubit(pokedex),
-        child: M(pokedex: pokedex,),
+        child: PokedexGridView(pokedex: pokedex,),
       ),
     );
   }
 }
 
-class M extends StatefulWidget {
-  final String name = "hello";
+class PokedexGridView extends StatefulWidget {
   late final Pokedex pokedex;
 
-  M({required this.pokedex});
+  PokedexGridView({required this.pokedex});
 
   @override
-  State<M> createState()=>_mState();
+  State<PokedexGridView> createState()=>_PokedexGridViewState();
 }
 
-class _mState extends State<M> {
-  final pokemonName = TextEditingController();
-  String? _dropdownvalue = "Lowest Number";
-  late final List<Pokemon> Pokemons = widget.pokedex.pokedex;
-  late List<Pokemon> pokemons = widget.pokedex.pokedex;
+class _PokedexGridViewState extends State<PokedexGridView> {
+  final pokemonSearchingName = TextEditingController();
+  String? _sortingDropDownValue = "Lowest Number";
+  late final List<Pokemon> POKEMON_LIST = widget.pokedex.pokedex;
+  late List<Pokemon> searchedPokemonsList = widget.pokedex.pokedex;
   void changeList() {
     setState(() {
-      pokemons = Pokemons;
-      pokemons.shuffle();
+      searchedPokemonsList = POKEMON_LIST;
+      searchedPokemonsList.shuffle();
     });
   }
-  int Compare(Pokemon a,Pokemon b,int type) {
+  int Compare(Pokemon a,Pokemon b,int type) { // Compare function for sorting
     if (type == 1) {
       if (a.id < b.id) return -1;
       else if (a.id > b.id) return 1;
@@ -78,25 +77,25 @@ class _mState extends State<M> {
     }
   }
   void onChanged(String? value) {
-      pokemons = Pokemons;
-      _dropdownvalue = value;
-      if (_dropdownvalue == "Lowest Number") {
-        pokemons.sort((a,b) => Compare(a, b,1));
+      searchedPokemonsList = POKEMON_LIST;
+      _sortingDropDownValue = value;
+      if (_sortingDropDownValue == "Lowest Number") {
+        searchedPokemonsList.sort((a,b) => Compare(a, b,1));
       }
-      else if (_dropdownvalue == "Highest Number") {
-        pokemons.sort((a,b) => -Compare(a,b,1));
+      else if (_sortingDropDownValue == "Highest Number") {
+        searchedPokemonsList.sort((a,b) => -Compare(a,b,1));
       }
-      else if (_dropdownvalue == "From A-Z") {
-        pokemons.sort((a,b) => Compare(a,b,2));
+      else if (_sortingDropDownValue == "From A-Z") {
+        searchedPokemonsList.sort((a,b) => Compare(a,b,2));
       }
       else{
-        pokemons.sort((a,b) => -Compare(a, b, 2));
+        searchedPokemonsList.sort((a,b) => -Compare(a, b, 2));
       }
       setState(() {
 
       });
   }
-  List<String> req = <String>['Lowest Number', 'Highest Number', 'From A-Z', 'From Z-A'];
+  List<String> _sortingRequest = <String>['Lowest Number', 'Highest Number', 'From A-Z', 'From Z-A'];
 
   @override
   Widget build(BuildContext context) {
@@ -106,26 +105,25 @@ class _mState extends State<M> {
       body: BlocListener<searchCubit,state>(
         listener: (context,state) {
           if (state is searchInit) {
-            print("hello world");
+
           }
-          else if (state is searchState) {
-            pokemons = state.result.pokedex;
+          else if (state is searchState) { // search state
+            searchedPokemonsList = state.result.pokedex; // get searched result
             setState(() {
 
             });
-            print("unga bunga");
           }
         },
         child: Column(
           children: [
             Container(
               child: TextFormField(
-                controller: pokemonName,
+                controller: pokemonSearchingName,
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
                     onPressed: () {
                       final _cubit = BlocProvider.of<searchCubit>(context);
-                      _cubit.searchPokemon(pokemonName.text);
+                      _cubit.searchPokemon(pokemonSearchingName.text);
                     },
                     icon: Icon(Icons.search),
                   ),
@@ -153,8 +151,8 @@ class _mState extends State<M> {
                     ),
                     DropdownButton(
                       onChanged: onChanged,
-                      value: _dropdownvalue,
-                      items: req.map<DropdownMenuItem<String>>((String value){
+                      value: _sortingDropDownValue,
+                      items: _sortingRequest.map<DropdownMenuItem<String>>((String value){
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -166,7 +164,7 @@ class _mState extends State<M> {
 
               ],
             ),
-            Expanded(child: GridView.count(crossAxisCount: 4,children: pokemons.map((e) => pokemonTag(poketmonster: e)).toList(),
+            Expanded(child: GridView.count(crossAxisCount: 4,children: searchedPokemonsList.map((e) => pokemonTag(poketmonster: e)).toList(),
               childAspectRatio: 0.8,
             ),)
           ],

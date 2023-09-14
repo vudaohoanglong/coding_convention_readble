@@ -5,7 +5,7 @@ import 'package:pokemon/model/Pokemon.dart';
 import 'package:pokemon/Type.dart';
 
 
-String intFixed(int n, int count) => n.toString().padLeft(count, "0");
+String intFixed(int n, int count) => n.toString().padLeft(count, "0"); // fixed length of number
 
 
 Widget pokemonTag({required Pokemon poketmonster}) {
