@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:pokemon/pokemonClass.dart';
+import 'package:pokemon/model/Pokemon.dart';
 
 import 'package:pokemon/Type.dart';
 
@@ -8,7 +8,7 @@ import 'package:pokemon/Type.dart';
 String intFixed(int n, int count) => n.toString().padLeft(count, "0");
 
 
-Widget pokemonTag({required Pokemon poketmonster}){
+Widget pokemonTag({required Pokemon poketmonster}) {
   return Wrap(
     children: [
       Container(

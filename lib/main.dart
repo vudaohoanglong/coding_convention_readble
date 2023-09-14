@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pokemon/Pokedex.dart';
-import 'package:pokemon/Pokemon.dart';
+import 'package:pokemon/model/Pokedex.dart';
+import 'package:pokemon/widget/Pokemon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'cubit/search_cubit.dart';
 
-import 'package:pokemon/pokemonClass.dart' show Pokemon;
+import 'package:pokemon/model/Pokemon.dart' show Pokemon;
 import 'package:http/http.dart' as http;
 
 void main() async {
-  List item=[];
-  List<Pokemon> pokemons=[];
+  List item = [];
+  List<Pokemon> pokemons = [];
   WidgetsFlutterBinding.ensureInitialized();
   // Fetch content from the json file
   Future<void> readJson() async {
@@ -20,7 +20,7 @@ void main() async {
     item=data;
   }
   await readJson();
-  for (int i=0;i<809;++i) {
+  for (int i = 0; i < 809; ++i) {
     pokemons.add(Pokemon.fromJson(item[i]));
   }
   Pokedex pokedex = Pokedex(pokemons);
@@ -58,7 +58,7 @@ class M extends StatefulWidget {
 
 class _mState extends State<M> {
   final pokemonName = TextEditingController();
-  String? _dropdownvalue="Lowest Number";
+  String? _dropdownvalue = "Lowest Number";
   late final List<Pokemon> Pokemons = widget.pokedex.pokedex;
   late List<Pokemon> pokemons = widget.pokedex.pokedex;
   void changeList() {
@@ -68,9 +68,9 @@ class _mState extends State<M> {
     });
   }
   int Compare(Pokemon a,Pokemon b,int type) {
-    if (type==1) {
-      if (a.id<b.id) return -1;
-      else if (a.id>b.id) return 1;
+    if (type == 1) {
+      if (a.id < b.id) return -1;
+      else if (a.id > b.id) return 1;
       else return 0;
     }
     else {
@@ -79,18 +79,18 @@ class _mState extends State<M> {
   }
   void onChanged(String? value) {
       pokemons = Pokemons;
-      _dropdownvalue=value;
-      if (_dropdownvalue=="Lowest Number") {
-        pokemons.sort((a,b)=>Compare(a, b,1));
+      _dropdownvalue = value;
+      if (_dropdownvalue == "Lowest Number") {
+        pokemons.sort((a,b) => Compare(a, b,1));
       }
-      else if (_dropdownvalue=="Highest Number") {
-        pokemons.sort((a,b)=>-Compare(a,b,1));
+      else if (_dropdownvalue == "Highest Number") {
+        pokemons.sort((a,b) => -Compare(a,b,1));
       }
-      else if (_dropdownvalue=="From A-Z") {
-        pokemons.sort((a,b)=>Compare(a,b,2));
+      else if (_dropdownvalue == "From A-Z") {
+        pokemons.sort((a,b) => Compare(a,b,2));
       }
       else{
-        pokemons.sort((a,b)=>-Compare(a, b, 2));
+        pokemons.sort((a,b) => -Compare(a, b, 2));
       }
       setState(() {
 
@@ -104,11 +104,11 @@ class _mState extends State<M> {
       appBar: AppBar(
       ),
       body: BlocListener<searchCubit,state>(
-        listener: (context,state){
-          if (state is searchInit){
+        listener: (context,state) {
+          if (state is searchInit) {
             print("hello world");
           }
-          else if (state is searchState){
+          else if (state is searchState) {
             pokemons = state.result.pokedex;
             setState(() {
 
@@ -123,7 +123,7 @@ class _mState extends State<M> {
                 controller: pokemonName,
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
-                    onPressed: (){
+                    onPressed: () {
                       final _cubit = BlocProvider.of<searchCubit>(context);
                       _cubit.searchPokemon(pokemonName.text);
                     },

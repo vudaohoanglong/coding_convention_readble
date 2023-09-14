@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 
-import '../Pokedex.dart';
+import '../model/Pokedex.dart';
 part 'search_state.dart';
 
-class searchCubit extends Cubit<state>{
+class searchCubit extends Cubit<state> {
   late final Pokedex pokedex;
   searchCubit(this.pokedex):super(searchInit());
   Future<void> searchPokemon(String name) async {
