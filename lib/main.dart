@@ -109,6 +109,18 @@ class _PokedexGridViewState extends State<PokedexGridView> {
           }
           else if (state is searchState) { // search state
             searchedPokemonsList = state.result.pokedex; // get searched result
+            if (_sortingDropDownValue == "Lowest Number") {
+              searchedPokemonsList.sort((a,b) => Compare(a, b,1));
+            }
+            else if (_sortingDropDownValue == "Highest Number") {
+              searchedPokemonsList.sort((a,b) => -Compare(a,b,1));
+            }
+            else if (_sortingDropDownValue == "From A-Z") {
+              searchedPokemonsList.sort((a,b) => Compare(a,b,2));
+            }
+            else{
+              searchedPokemonsList.sort((a,b) => -Compare(a, b, 2));
+            }
             setState(() {
 
             });

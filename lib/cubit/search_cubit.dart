@@ -9,7 +9,7 @@ class searchCubit extends Cubit<state> {
   Future<void> searchPokemon(String name) async {
     emit(searchInit());
     emit(searchInit());
-    Pokedex result = await pokedex.search(name);
+    Pokedex result = await pokedex.trieSearch(name); // using trie to search
     emit(searchState(result: result));
   }
 }
