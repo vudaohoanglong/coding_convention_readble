@@ -1,47 +1,64 @@
 import 'dart:convert';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pokemon/Pokedex.dart';
 import 'package:pokemon/Pokemon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'cubit/search_cubit.dart';
+
 import 'package:pokemon/pokemonClass.dart' show Pokemon;
 import 'package:http/http.dart' as http;
-List item=[];
-List<Pokemon> pokemons=[];
+
 void main() async{
+  List item=[];
+  List<Pokemon> pokemons=[];
   WidgetsFlutterBinding.ensureInitialized();
   // Fetch content from the json file
-  Future<void> readJson() async {
-    final String response = await rootBundle.loadString('assets/pokemon.json');
-    final data = await json.decode(response);
-    item=data;
-  }
-  await readJson();
-
-  for (int i=0;i<809;++i){
-    pokemons.add(Pokemon.fromJson(item[i]));
-  }
-  runApp(myApp());
+    Future<void> readJson() async{
+      final String response = await rootBundle.loadString('assets/pokemon.json');
+      final data = await json.decode(response);
+      item=data;
+    }
+    await readJson();
+    for (int i=0;i<809;++i){pokemons.add(Pokemon.fromJson(item[i]));
+    }
+    Pokedex pokedex = Pokedex(pokemons);
+    runApp(myApp(pokedex: pokedex,));
 }
 
 class myApp extends StatelessWidget{
+  final Pokedex pokedex;
+  myApp({required this.pokedex});
   @override
   Widget build(BuildContext context){
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'test',
-      home: M(),
+      //home: M(pokedex: pokedex,),
+      home: BlocProvider(
+        create: (context) => searchCubit(pokedex),
+        child: M(pokedex: pokedex,),
+      ),
     );
   }
 }
 
-class M extends StatefulWidget{
+  class M extends StatefulWidget{
+  final String name = "hello";
+  late final Pokedex pokedex;
+  M({required this.pokedex});
   @override
   State<M> createState()=>_mState();
-}
+  }
 
-class _mState extends State<M>{
+  class _mState extends State<M>{
+  final pokemonName = TextEditingController();
   String? _dropdownvalue="Lowest Number";
+  late final List<Pokemon> Pokemons = widget.pokedex.pokedex;
+  late List<Pokemon> pokemons = widget.pokedex.pokedex;
   void changeList(){
     setState(() {
+      pokemons = Pokemons;
       pokemons.shuffle();
     });
   }
@@ -56,6 +73,7 @@ class _mState extends State<M>{
     }
   }
   void onChanged(String? value){
+      pokemons = Pokemons;
       _dropdownvalue=value;
       if (_dropdownvalue=="Lowest Number"){
         pokemons.sort((a,b)=>Compare(a, b,1));
@@ -79,9 +97,35 @@ class _mState extends State<M>{
     return Scaffold(
       appBar: AppBar(
       ),
-      body: Center(
+      body: BlocListener<searchCubit,state>(
+        listener: (context,state){
+          if (state is searchInit){
+            print("hello world");
+          }
+          else if (state is searchState){
+            pokemons = state.result.pokedex;
+            setState(() {
+
+            });
+            print("unga bunga");
+          }
+        },
         child: Column(
           children: [
+            Container(
+              child: TextFormField(
+                controller: pokemonName,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    onPressed: (){
+                      final _cubit = BlocProvider.of<searchCubit>(context);
+                      _cubit.searchPokemon(pokemonName.text);
+                    },
+                    icon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -124,4 +168,4 @@ class _mState extends State<M>{
       ),
     );
   }
-}
+  }
